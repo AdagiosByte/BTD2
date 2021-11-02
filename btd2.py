@@ -1,6 +1,7 @@
 import pyautogui
 import random
 import time
+from csv import writer
 
 #csv files created
 def addTowerToCsv(elementList):
@@ -8,11 +9,21 @@ def addTowerToCsv(elementList):
         csv_writer = writer(csv)
         csv_writer.writerow(elementList)
 
-#difficulties
+#check tower placement
+def checkTower():
+    a = pyautogui.screenshot()
+    i = a.getpixel((770,606))
+    #checks for sell option
+    if i[0] == 177 and i[1] == 70 and i[2] == 85:
+        return True
+    return False
+
+#difficulties and tower placement
 def easy(items):
     if i[2] > 250 and i[0] < 200:
         pyautogui.click()
-        addTowerToCsv(items)
+        if checkTower() == True:
+            addTowerToCsv(items)
         return True
     elif i[0] == 255 and i[1] == 255 and i[2] == 255:
         return True
@@ -29,7 +40,7 @@ def hard(items):
         return True
     return False
 
-#towers
+#tower select
 def dart():
     pyautogui.click(780,200) # buy dart monkey
     global towerType
@@ -46,20 +57,23 @@ def boomerang():
     
 #pop balloons that almost made it to the end
 def roadSpikes(difficulty):
-    pyautogui.click(780,250) # buy road spikes
     a = pyautogui.screenshot()
     
     if difficulty == 0:
         i = a.getpixel((550,660))
         if i[0] != 255 or i[1] != 255 or i[2] != 255:
-            pyautogui.click(550,660)
+            pyautogui.click(780,250) # buy road spikes
+            pyautogui.moveTo(550,660)
+            pyautogui.click()
     elif difficulty == 1: #WIP
         i = a.getpixel((550,660))
         if i[0] != 255 or i[1] != 255 or i[2] != 255:
+            pyautogui.click(780,250) # buy road spikes
             pyautogui.click(550,660)
     else: #WIP
         i = a.getpixel((550,660))
         if i[0] != 255 or i[1] != 255 or i[2] != 255:
+            pyautogui.click(780,250) # buy road spikes
             pyautogui.click(550,660)
 
 gameOver = False
@@ -103,13 +117,15 @@ while gameOver == False:
         i = a.getpixel((x-60,y))
         
         items = [x,y,difficulty,towerType]
-        towerType = -1
+        
         
         #place tower
         placedTower = stage[difficulty](items)
         if placedTower == True:
             lx = x
             ly = y
+        
+        towerType = -1
         
         
     pyautogui.click(lx,ly) # click last purchaced tower
